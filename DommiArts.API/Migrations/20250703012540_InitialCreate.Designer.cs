@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DommiArts.API.Migrations
 {
     [DbContext(typeof(DommiArtsDbContext))]
-    [Migration("20250702223009_InitialCreate")]
+    [Migration("20250703012540_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -41,7 +41,7 @@ namespace DommiArts.API.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("DommiArts.API.Models.Product", b =>
+            modelBuilder.Entity("Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -49,8 +49,8 @@ namespace DommiArts.API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Category")
-                        .HasColumnType("text");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -64,28 +64,25 @@ namespace DommiArts.API.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("ProductCategoryId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("StockQuantity")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductCategoryId");
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("DommiArts.API.Models.Product", b =>
+            modelBuilder.Entity("Product", b =>
                 {
-                    b.HasOne("DommiArts.API.Models.Category", "ProductCategory")
+                    b.HasOne("DommiArts.API.Models.Category", "Category")
                         .WithMany("Products")
-                        .HasForeignKey("ProductCategoryId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ProductCategory");
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("DommiArts.API.Models.Category", b =>
