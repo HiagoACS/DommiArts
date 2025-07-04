@@ -5,6 +5,6 @@ namespace DommiArts.API.DTOs.Category
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
-        public ICollection<ProductDTO> Products { get; set; } = new List<ProductDTO>();
+        public IEnumerable<ProductDTO> Products { get; set; } = new List<ProductDTO>();
     }
 }

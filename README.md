@@ -41,4 +41,6 @@ A proposta do DommiArts é, além de praticar habilidades avançadas em C#, cria
 
 ---
 
-🔗 **Status do projeto:** Em desenvolvimento.
+🔗 **Status do projeto:** Em desenvolvimento.  
+🔗 **Observação 1:** Ainda que os commits estejam em inglês, a documentação e comentários estão em português.  
+🔗 **Observação 2:** Os comentários são feitos manualmente ou gerados pela IntelliSense do Visual Studio, garantindo clareza e compreensão do código.

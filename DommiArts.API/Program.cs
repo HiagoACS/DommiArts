@@ -24,6 +24,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); // Configuração do AutoMapper
+
 var app = builder.Build();
 
 // Pipeline HTTP:

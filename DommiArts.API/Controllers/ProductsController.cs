@@ -3,6 +3,7 @@ using DommiArts.API.Data;
 using DommiArts.API.DTOs.Product;
 using DommiArts.API.Models;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace DommiArts.API.Controllers
 {
@@ -11,9 +12,11 @@ namespace DommiArts.API.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly DommiArtsDbContext _context;
-        public ProductsController(DommiArtsDbContext context)
+        private readonly IMapper _mapper;
+        public ProductsController(DommiArtsDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/products
@@ -21,31 +24,20 @@ namespace DommiArts.API.Controllers
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts() //IEnumerable<ProductDTO> para retornar uma lista de produtos
         {
             var products = await _context.Products
-                .Select(p => new ProductDTO
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price,
-                    Description = p.Description,
-                    ImageUrl = p.ImageUrl,
-                    StockQuantity = p.StockQuantity
-                }).ToListAsync();
+                .Include(p => p.Category) // Inclui a categoria relacionada ao produto
+                .ToListAsync();
 
-            return Ok(products); // Retorna a lista de produtos com suas categorias
+            var productDTOs = _mapper.Map<IEnumerable<ProductDTO>>(products); // Mapeia a lista de produtos para DTOs
+            return Ok(productDTOs); // Retorna a lista de produtos com suas categorias
         }
 
         // POST: api/products
         [HttpPost]
         public async Task<ActionResult<ProductDTO>> CreateProduct([FromBody] ProductCreateDTO dto) // usando [FromBody] para receber o objeto JSON
         {
-            Product product = new Product
-            {
-                Name = dto.Name,
-                Price = dto.Price,
-                Description = dto.Description,
-                ImageUrl = dto.ImageUrl,
-                StockQuantity = dto.StockQuantity
-            };
+            Product product = _mapper.ConfigurationProvider
+                .CreateMapper()
+                .Map<Product>(dto); // Mapeia o DTO para o modelo Product
 
             if (product == null)
             {
@@ -53,15 +45,7 @@ namespace DommiArts.API.Controllers
             }
 
             // Criado DTO de resposta para retornar o produto criado
-            ProductDTO createdProduct = new ProductDTO
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Price = product.Price,
-                Description = product.Description,
-                ImageUrl = product.ImageUrl,
-                StockQuantity = product.StockQuantity
-            };
+            ProductDTO createdProduct = _mapper.Map<ProductDTO>(product); // Mapeia o modelo Product para ProductDTO
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
@@ -73,20 +57,16 @@ namespace DommiArts.API.Controllers
         public async Task<ActionResult<ProductDTO>> GetProductsById(int id)
         {
             var product = await _context.Products
-                .Where(p => p.Id == id).Select(ProductDTO => new ProductDTO
-                {
-                    Name = ProductDTO.Name,
-                    Price = ProductDTO.Price,
-                    Description = ProductDTO.Description,
-                    ImageUrl = ProductDTO.ImageUrl,
-                    StockQuantity = ProductDTO.StockQuantity
-                }).FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(p => p.Id == id); // Busca o produto pelo ID
 
             if (product == null)
             {
                 return NotFound();
             }
-            return Ok(product);
+
+            var productDTO = _mapper.Map<ProductDTO>(product); // Mapeia o produto para ProductDTO
+
+            return Ok(productDTO);
         }
 
         private bool ProductExists(int id)
@@ -111,11 +91,7 @@ namespace DommiArts.API.Controllers
             }
 
             // Atualiza as propriedades do produto com os dados do DTO
-            product.Name = dto.Name;
-            product.Price = dto.Price;
-            product.Description = dto.Description;
-            product.ImageUrl = dto.ImageUrl;
-            product.StockQuantity = dto.StockQuantity;
+            product = _mapper.Map(dto, product); // Mapeia o DTO para o modelo Product existente
 
             try
             {
