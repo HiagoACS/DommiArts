@@ -43,7 +43,14 @@ namespace DommiArts.API.Controllers
             {
                 return BadRequest("Product cannot be null.");
             }
-
+            if (product.Category != null) {
+                
+                var categoryExists = await _context.Categories.AnyAsync(c => c.Id == product.CategoryId); // Verificando se a categoria existe no banco de dados
+                if (!categoryExists)
+                {
+                    return BadRequest("Category does not exist.");
+                }
+            }
             // Criado DTO de resposta para retornar o produto criado
             ProductDTO createdProduct = _mapper.Map<ProductDTO>(product); // Mapeia o modelo Product para ProductDTO
 
@@ -78,11 +85,6 @@ namespace DommiArts.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductUpdateDTO dto)
         {
-
-            if (!ModelState.IsValid) // Verifica se o modelo é válido
-            {
-                return BadRequest(ModelState);
-            }
 
             var product = await _context.Products.FindAsync(id);
             if (product == null)
