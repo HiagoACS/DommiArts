@@ -7,9 +7,11 @@ namespace DommiArts.API.Controllers
     using DommiArts.API.DTOs.Category;
     using DommiArts.API.DTOs.Product;
     using AutoMapper;
+    using Microsoft.AspNetCore.Authorization;
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CategoriesController : ControllerBase
     {
         private readonly DommiArtsDbContext _context;
@@ -32,8 +34,10 @@ namespace DommiArts.API.Controllers
 
             return Ok(categoriesDTOs); 
         }
+
         // POST: api/categories
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<CategoryDTO>> CreateCategory([FromBody] CategoryCreateDTO dto)
         {
             Category category = _mapper.Map<Category>(dto); // Mapeia o DTO para o modelo Category
@@ -67,12 +71,8 @@ namespace DommiArts.API.Controllers
             return Ok(categoryDTO);
         }
 
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.Id == id);
-        }
-
         // PUT: api/categories/{id}
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryUpdateDTO dto)
         {
@@ -131,6 +131,7 @@ namespace DommiArts.API.Controllers
 
         // DELETE: api/categories/{id}
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var category = await _context.Categories.FindAsync(id);

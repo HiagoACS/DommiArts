@@ -4,11 +4,14 @@ using DommiArts.API.DTOs.Product;
 using DommiArts.API.Models;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace DommiArts.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly DommiArtsDbContext _context;
@@ -32,6 +35,7 @@ namespace DommiArts.API.Controllers
         }
 
         // POST: api/products
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<ProductDTO>> CreateProduct([FromBody] ProductCreateDTO dto) // usando [FromBody] para receber o objeto JSON
         {
@@ -82,6 +86,7 @@ namespace DommiArts.API.Controllers
         }
 
         // PUT: api/products/{id}
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductUpdateDTO dto)
         {
@@ -114,6 +119,7 @@ namespace DommiArts.API.Controllers
         }
 
         // DELETE: api/products/{id}
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
