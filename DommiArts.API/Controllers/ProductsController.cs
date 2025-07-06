@@ -39,9 +39,7 @@ namespace DommiArts.API.Controllers
         [HttpPost]
         public async Task<ActionResult<ProductDTO>> CreateProduct([FromBody] ProductCreateDTO dto) // usando [FromBody] para receber o objeto JSON
         {
-            Product product = _mapper.ConfigurationProvider
-                .CreateMapper()
-                .Map<Product>(dto); // Mapeia o DTO para o modelo Product
+            Product product = _mapper.Map<Product>(dto); // Mapeia o DTO para o modelo Product
 
             if (product == null)
             {
@@ -49,7 +47,7 @@ namespace DommiArts.API.Controllers
             }
             if (product.Category != null) {
                 
-                var categoryExists = await _context.Categories.AnyAsync(c => c.Id == product.CategoryId); // Verificando se a categoria existe no banco de dados
+                var categoryExists = await _context.Categories.AnyAsync(c => c.Id == dto.CategoryId); // Verificando se a categoria existe no banco de dados
                 if (!categoryExists)
                 {
                     return BadRequest("Category does not exist.");

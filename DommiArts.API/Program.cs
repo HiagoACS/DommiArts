@@ -116,6 +116,9 @@ using (var scope = app.Services.CreateScope())
 }
 
 
+// Middleware
+
+app.UseMiddleware<DommiArts.API.Middlewares.ExceptionMiddleware>(); // Usando Middleware para resposta ser um JSON padronizado de erro
 
 // Pipeline HTTP:
 if (app.Environment.IsDevelopment())
