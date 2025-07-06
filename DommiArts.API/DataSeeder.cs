@@ -19,7 +19,7 @@ public class DataSeeder
 
             var admin = new User
             {
-                Username = "Administrator",
+                Username = "administrator",
                 Email = "admin@admin.com",
                 PasswordHash = Convert.ToBase64String(hash),
                 PasswordSalt = Convert.ToBase64String(salt),

@@ -63,6 +63,8 @@ namespace DommiArts.API.Controllers
                     new Claim(ClaimTypes.Role, user.Role ?? "User")
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
+                Issuer = _configuration["Jwt:Issuer"],      
+                Audience = _configuration["Jwt:Audience"], 
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
