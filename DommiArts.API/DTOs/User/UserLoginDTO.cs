@@ -1,8 +1,8 @@
-namespace DommiArts.API.DTOs.User
-{
-    public class UserLoginDTO
+    namespace DommiArts.API.DTOs.User
     {
-        public string? Username { get; set; } = null!; 
-        public string? Password { get; set; } = null!;
+        public class UserLoginDTO
+        {
+            public string? Username { get; set; } = null!; 
+            public string? Password { get; set; } = null!;
+        }
     }
-}

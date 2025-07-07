@@ -12,5 +12,9 @@ namespace DommiArts.API.Models
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
         public string? Role { get; set; } = "User"; // e.g., "Admin", "User"
+
+        // RefreshToken
+        public String? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
     }
 }

@@ -26,6 +26,8 @@ namespace DommiArts.API.Controllers
             _mapper = mapper;
         }
 
+        // FUNÇÕES AUXILIARES
+
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using var hmac = new HMACSHA512();
@@ -70,6 +72,16 @@ namespace DommiArts.API.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        //CONTROLLERS
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserCreateDTO userCreateDto)
@@ -131,8 +143,62 @@ namespace DommiArts.API.Controllers
             }
 
             var token = CreateToken(user);
-            return Ok(new { token });
+            var refreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { token, refreshToken });
         }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody]RequestTokenDTO requestToken)
+        {
+            if(requestToken == null || string.IsNullOrEmpty(requestToken.RefreshToken))
+            {
+                return BadRequest("Refresh token is required.");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == requestToken.RefreshToken);
+
+            if(user == null || user.RefreshTokenExpiryTime == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                return Unauthorized("Invalid or expired refresh token.");
+            }
+
+            var newJwtToken = CreateToken(user);
+            var newrefreshToken = GenerateRefreshToken();
+            
+            user.RefreshToken = newrefreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new {token = newJwtToken, RefreshToken = newrefreshToken });
+                
+        }
+
+        [HttpPost("revoke-token")]
+        public async Task<IActionResult> RevokeToken([FromBody] RequestTokenDTO requestToken)
+        {
+            if (requestToken == null || string.IsNullOrEmpty(requestToken.RefreshToken))
+                return BadRequest("Refresh token is required.");
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == requestToken.RefreshToken);
+            if (user == null)
+                return NotFound("User not found.");
+
+            // "Invalidar" o refresh token
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = null;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent(); // Logout feito com sucesso
+        }
+
 
         private bool UserExists(int id)
         {
@@ -191,4 +257,3 @@ namespace DommiArts.API.Controllers
 
     }
 }
-        
