@@ -1,13 +1,12 @@
+using Microsoft.AspNetCore.Mvc;
+using DommiArts.API.Data;
+using DommiArts.API.Models;
+using Microsoft.EntityFrameworkCore;
+using DommiArts.API.DTOs.Category;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 namespace DommiArts.API.Controllers
 {
-    using Microsoft.AspNetCore.Mvc;
-    using DommiArts.API.Data;
-    using DommiArts.API.Models;
-    using Microsoft.EntityFrameworkCore;
-    using DommiArts.API.DTOs.Category;
-    using DommiArts.API.DTOs.Product;
-    using AutoMapper;
-    using Microsoft.AspNetCore.Authorization;
 
     [Route("api/[controller]")]
     [ApiController]

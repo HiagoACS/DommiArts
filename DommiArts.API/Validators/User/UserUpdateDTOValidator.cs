@@ -2,7 +2,6 @@ using FluentValidation;
 using DommiArts.API.DTOs.User;
 
 namespace DommiArts.API.Validators.User { 
-
    public class UserUpdateDTOValidator : AbstractValidator<UserUpdateDTO>
     {
         public UserUpdateDTOValidator()
