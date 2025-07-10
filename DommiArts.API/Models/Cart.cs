@@ -4,7 +4,7 @@ namespace DommiArts.API.Models{
     {
         public int Id { get; set; }
 
-        public int UserId { get; set; }
+        public int? UserId { get; set; } = null;
 
         public User? User { get; set; } = null;
 
