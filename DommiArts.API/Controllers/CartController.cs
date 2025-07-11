@@ -26,7 +26,16 @@ namespace DommiArts.API.Controllers
         {
             var cart = new Cart();
             _context.Carts.Add(cart);
-            await _context.SaveChangesAsync();
+            try
+            {
+
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine($"--> Erro do Banco de Dados: {ex.InnerException?.Message}");
+                return StatusCode(500, $"Erro interno ao salvar no banco: {ex.InnerException?.Message}");
+            }
 
             var cartDTO = _mapper.Map<CartDTO>(cart);
             return CreatedAtAction(nameof(GetCartById), new { id = cart.Id }, cartDTO);
