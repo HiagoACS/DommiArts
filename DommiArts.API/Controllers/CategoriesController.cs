@@ -10,7 +10,6 @@ namespace DommiArts.API.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class CategoriesController : ControllerBase
     {
         private readonly DommiArtsDbContext _context;

@@ -1,17 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using DommiArts.API.Data;
 using DommiArts.API.DTOs.Product;
-using DommiArts.API.Models;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using System.Data;
 
 namespace DommiArts.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly DommiArtsDbContext _context;
