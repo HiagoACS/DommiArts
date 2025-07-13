@@ -44,13 +44,20 @@ namespace DommiArts.API.Controllers
             if (!cartExists)
                 return NotFound("Cart not found.");
 
-            var cartItem = _mapper.Map<CartItem>(dto);
+            var cartItem = new CartItem
+            {
+                CartId = dto.CartId,
+                ProductId = dto.ProductId,
+                Quantity = dto.Quantity,
+                UnitPrice = product.Price, // <-- AQUI o preço é corretamente atribuído
+            };
+
             _context.CartItems.Add(cartItem);
             await _context.SaveChangesAsync();
 
             var result = await _context.CartItems
                 .Include(ci => ci.Product)
-                .FirstOrDefaultAsync(ci => ci.Id == cartItem.Id);
+                .FirstOrDefaultAsync(ci => ci.Id == cartItem.Id); // Obtém o item recém-criado com o produto incluído
 
             return CreatedAtAction(nameof(GetItemsByCart), new { cartId = dto.CartId }, _mapper.Map<CartItemDTO>(result));
         }
@@ -99,18 +106,21 @@ namespace DommiArts.API.Controllers
             return Ok(new { Message = "Quantity updated successfully." });
         }
 
-        // DELETE: api/cartitems/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        // DELETE: api/cartitems
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] int cartId, [FromQuery] int productId)
         {
-            var item = await _context.CartItems.FindAsync(id);
+            var item = await _context.CartItems
+                .FirstOrDefaultAsync(ci => ci.CartId == cartId && ci.ProductId == productId);
+
             if (item == null)
-                return NotFound();
+                return NotFound("Cart item not found for the given cart and product.");
 
             _context.CartItems.Remove(item);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
     }
 }
